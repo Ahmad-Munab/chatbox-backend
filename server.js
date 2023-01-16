@@ -16,9 +16,6 @@ app.use(express.urlencoded({ extended: true }));
 // Routing
 app.use(express.static(__dirname + '/public'));
 app.use('/', require('./routes/root.js'));
-app.use('/register', require('./routes/registerRoute'));
-app.use('/login', require('./routes/loginRoute'));
-app.get('/users', require('./controllers/getAllUsers'));
 
 
 app.all("*", (req, res) => {
