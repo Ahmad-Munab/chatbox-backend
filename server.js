@@ -6,6 +6,7 @@ const path = require('path');
 
 PORT = 3500;
 DATABASE_URI = process.env.DATABASE_URI;
+console.log(DATABASE_URI)
 const app = express();
 
 // Defining middlewares
