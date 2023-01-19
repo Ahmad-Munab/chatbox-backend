@@ -4,9 +4,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 
-PORT = 3500;
+PORT = process.env.PORT || 3500
 DATABASE_URI = process.env.DATABASE_URI;
-console.log(DATABASE_URI)
+const chats = require('./data/data')
 const app = express();
 
 // Defining middlewares
@@ -17,6 +17,19 @@ app.use(express.urlencoded({ extended: true }));
 // Routing
 app.use(express.static(__dirname + '/public'));
 app.use('/', require('./routes/root.js'));
+
+app.use("/api/chats", (req, res) => {
+    if (req.body.id) {
+        try {
+            var chat = chats.find(chat => chat._id === req.body.id)
+            res.status(200).json(chat)
+        } catch (err) {
+            res.status(500).json({ err: err })
+        }
+    } else {
+        res.status(200).json(chats)
+    }
+})
 
 
 app.all("*", (req, res) => {
