@@ -28,7 +28,7 @@ const updateFriends = asyncHandler(async (req, res) => {
     mongoose.Types.ObjectId(friendId)
   );
   if (isAlreadyFriends) {
-    return res.status(200).json({ message: `Already friends with ${friend.username} (${friend.handle})` });
+    return res.status(400).json({ message: `Already friends with ${friend.username} (${friend.handle})` });
   }
 
   try {
@@ -78,12 +78,12 @@ const deleteFriend = asyncHandler(async (req, res) => {
     );
     await friend.save();
 
-    const chatId = await Chat.find({
+    const chatId = await Chat.findOne({
       users: { $elemMatch: { $eq: req.user._id } },
     })
     await Chat.findByIdAndDelete(chatId).lean();
 
-    res.status(200).json({ message: "Friend deleted", deletedFriendId: friend._id, deletedChatId: chatId});
+    res.status(200).json({ message: "Friend deleted", deletedFriendId: friend._id, deletedChatId: chatId._id});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });

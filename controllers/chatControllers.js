@@ -11,7 +11,7 @@ const getChats = asyncHandler(async (req, res) => {
       users: { $elemMatch: { $eq: req.user._id } },
     })
       .populate("users", "-password")
-      .populate("admin", "-password");
+      .populate("admin", "-password")
       
     return res.status(200).json(chats);
   } catch (error) {
@@ -20,10 +20,7 @@ const getChats = asyncHandler(async (req, res) => {
 });
 
 const accessChat = asyncHandler(async (req, res) => {
-  const { userId } = req.body;
-  if (!userId) {
-    res.status(400).json({ message: "userID is required" });
-  }
+  const userId = req.user._id;
 
   const chat = await Chat.find({
     isGroupChat: false,

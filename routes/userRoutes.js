@@ -12,6 +12,7 @@ router.route('/')
     .patch(protect , userControllers.updateUser)
     .put(protect, userControllers.updateUser)
     .delete(protect, userControllers.deleteUser)
+router.get('/data', protect, userControllers.getUserData)
 router.post('/register',protectCloud, userControllers.registerUser)
 router.post('/login', userControllers.loginUser)
 // router.post('/uploadImg', upload.single('image'), userControllers.uploadImg);

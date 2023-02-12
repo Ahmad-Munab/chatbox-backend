@@ -3,11 +3,25 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 
 const User = require(path.join(__dirname, "../models/User"));
+const Chat = require(path.join(__dirname, "../models/Chat"));
 
 const  jwt = require("jsonwebtoken");
 const { generateJWT } = require("../config/generateJWT");
 const { generateIMG } = require("../config/generateIMG");
 
+
+const getUserData = asyncHandler( async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate("friends", "-password")
+    const chats = await Chat.find({
+      users: { $elemMatch: { $eq: req.user._id } },
+    }).populate("users", "-password")
+    return res.status(200).json({user, chats})
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
+})
 
 const getUsers = asyncHandler(async (req, res) => {
   try {
@@ -127,6 +141,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 module.exports = {
   getUsers,
+  getUserData,
   registerUser,
   loginUser,
   updateUser,
