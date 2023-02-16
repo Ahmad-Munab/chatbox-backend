@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const path = require("path");
 const User = require(path.join(__dirname, "../models/User"));
 const Chat = require(path.join(__dirname, "../models/Chat"));
+const Message = require(path.join(__dirname, "../models/Message"));
 
 const mongoose = require("mongoose");
 
@@ -23,6 +24,11 @@ const updateFriends = asyncHandler(async (req, res) => {
   if (!friend)
     return res.status(404).json({ message: "No user with friendId found" });
   friendId = friend._id;
+
+  // this isnt working, fixing later
+  // if (mongoose.Types.ObjectId(friendId) === mongoose.Types.ObjectId(req.user._id)) {
+  //   return res.status(400).json({ message: "You can't add yourself as a friend :/" })
+  // }
 
   const isAlreadyFriends = req.user.friends.includes(
     mongoose.Types.ObjectId(friendId)
@@ -78,16 +84,20 @@ const deleteFriend = asyncHandler(async (req, res) => {
     );
     await friend.save();
 
-    const chatId = await Chat.findOne({
-      users: { $elemMatch: { $eq: req.user._id } },
-    })
-    await Chat.findByIdAndDelete(chatId).lean();
+    const chat = await Chat.findOne({
+      users: { $elemMatch: { $eq: mongoose.Types.ObjectId(req.user._id) } },
+      isGroupChat: false,
+    });
+    await Chat.findByIdAndDelete(chat._id);
 
-    res.status(200).json({ message: "Friend deleted", deletedFriendId: friend._id, deletedChatId: chatId._id});
+    const deletedMessages = await Message.deleteMany({ to: chat._id });
+
+    res.status(200).json({ message: "Friend deleted", deletedFriendId: friend._id, deletedChatId: chat._id, deletedMessages});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
+
 
 module.exports = { getFriends, updateFriends, deleteFriend };

@@ -49,4 +49,23 @@ const sendMessage = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { getMessages, sendMessage };
+const deleteMessages = asyncHandler(async (req, res) => {
+  if (!req.body.chatId && !req.body.messageId) {
+    return res.status(400).json({ message: "chatId or messageId required" });
+  }
+  try {
+    if (req.body.chatId) {
+      await Message.deleteMany({ to: req.body.chatId });
+      return res.status(200).json({ messages: "Successfully deleted all the messages"});
+    } else if (req.body.messageId) {
+      await Message.findByIdAndDelete(req.body.messageId);
+      return res.status(200).json({ messages: "Successfully deleted the message"});
+    }
+    
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = { getMessages, sendMessage, deleteMessages };

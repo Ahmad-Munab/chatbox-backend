@@ -61,12 +61,19 @@ const deleteChat = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Bad request, chatId required." });
   }
 
-  const chat = await Chat.findByIdAndDelete(chatId).lean();
-  if (!chat) {
-    return res.status(404).json({ message: `chatId: ${chatId} not found` });
-  }
+  try {
+    const deletedChat = await Chat.findByIdAndDelete(chatId).lean();
+    const deletedMessages = await Message.deleteMany({ to: req.body.chatId });
 
-  res.status(200).json({ message: "Chat deleted successfully" });
+    if (deletedChat && deletedMessages) {
+      return res.status(200).json({ message: "Chat deleted successfully" });
+    } else {
+      return res.status(500).json({ error: error.message });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = { getChats, accessChat, deleteChat };

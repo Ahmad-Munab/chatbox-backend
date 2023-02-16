@@ -51,7 +51,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }).exec();
   if (duplicate) {
     return res.status(400).json({
-      message: `User with name: ${duplicate.username} already exists`,
+      message: `Name: ${duplicate.username} already exists`,
     });
   }
 

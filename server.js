@@ -7,6 +7,10 @@ const cloudinary = require('cloudinary').v2;
 const cookieParser = require('cookie-parser');
 const protect = require("./middlewares/authUser")
 
+const http = require("http");
+const { Server } = require("socket.io");
+const { exit } = require('process');
+
 const cloudinaryConfig = cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -55,25 +59,47 @@ app.all("*", (req, res) => {
 })
 
 
-// Connecting to MongoDB
-mongoose.set('strictQuery', true)
+mongoose.set("strictQuery", true);
+
 const connectDB = async () => {
-    try {
-        await mongoose.connect(DATABASE_URI)
-    } catch (err) {
-        console.log(err)
-    }
-}
-connectDB()
+  try {
+    await mongoose.connect(DATABASE_URI);
+    console.log("Connected to MongoDB");
 
-// Starting server and MongoDB
-mongoose.connection.once("open", () => {
-    console.log("Connected to MongoDB")
-    app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`))
+    const server = http.createServer(app);
+    const io = new Server(server, {
+      cors: {
+        origin: "*",
+        methods: ["GET", "POST", "PUT","PATCH", "DELETE"]
+      }
+    });
 
-})
+    io.on("connection", (socket) => {
+      console.log(`User ${socket.id} connected`);
 
-//Checking for err in MongoDB
-mongoose.connection.on("error", err => {
-    console.log(err)
-})
+      socket.on("join_chat", (chatId) => {
+        socket.join(chatId);
+        console.log(`User ${socket.id} joined chat: ${chatId}`);
+      })
+
+      socket.on("send_message", (message_data) => {
+        // console.log(messages_data)
+        console.log(`sending messages ${message_data.text}`)
+        socket.to(message_data.to).emit("receive_message", message_data)
+      })
+
+      socket.on("disconnect", () => {
+        console.log(`User ${socket.id} disconnected`);
+      })
+    });
+
+    server.listen(PORT, () => {
+      console.log(`Server running on port http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.log(err);
+    exit(1)
+  }
+};
+
+connectDB();

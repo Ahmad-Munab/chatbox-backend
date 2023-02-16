@@ -6,5 +6,6 @@ const messageControllers = require(path.join(__dirname, '../controllers/messageC
 router.route('/')
     .get(messageControllers.getMessages)
     .post(messageControllers.sendMessage)
+    .delete(messageControllers.deleteMessages)
 
 module.exports = router
