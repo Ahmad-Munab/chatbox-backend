@@ -24,7 +24,7 @@ const app = express();
 
 // Defining middlewares
 app.use(cors({
-    origin: ['localhost:3000', 'sudochat.netliyfy.app'],
+    origin: ['http://localhost:3000', 'https://sudochat.netliyfy.app'],
     methods: ["GET","POST","PUT","PATCH","DELETE"]
 }))
 app.use(express.json());
@@ -72,7 +72,7 @@ const connectDB = async () => {
     const server = http.createServer(app);
     const io = new Server(server, {
       cors: {
-        origin: ['localhost:3000', 'sudochat.netliyfy.app'],
+        origin: ['http://localhost:3000', 'https://sudochat.netliyfy.app'],
         methods: ["GET","POST","PUT","PATCH","DELETE"]
       }
     });
