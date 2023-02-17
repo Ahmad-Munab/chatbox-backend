@@ -23,7 +23,10 @@ const DATABASE_URI = process.env.DATABASE_URI;
 const app = express();
 
 // Defining middlewares
-app.use(cors());
+app.use(cors({
+    origin: ['localhost:3000', 'sudochat.netlyfy.app'],
+    methods: ["GET","POST","PUT","PATCH","DELETE"]
+}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -69,8 +72,8 @@ const connectDB = async () => {
     const server = http.createServer(app);
     const io = new Server(server, {
       cors: {
-        origin: "*",
-        methods: ["GET", "POST", "PUT","PATCH", "DELETE"]
+        origin: ['localhost:3000', 'sudochat.netlyfy.app'],
+        methods: ["GET","POST","PUT","PATCH","DELETE"]
       }
     });
 
