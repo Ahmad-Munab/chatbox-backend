@@ -97,7 +97,7 @@ const connectDB = async () => {
     });
 
     server.listen(PORT, () => {
-      console.log(`Server running on port http://localhost:${PORT}`);
+      console.log(`Server running on port http://chatbox101.adaptable.app on port:${PORT}`);
     });
   } catch (err) {
     console.log(err);
