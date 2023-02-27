@@ -79,6 +79,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
+  console.log(`User ${req.body.handle} is logging in`)
   const { handle, password } = req.body;
   if (!handle || !password) {
     return res.status(400).json({
